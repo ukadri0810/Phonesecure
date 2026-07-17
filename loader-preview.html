@@ -1,309 +1,313 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Privacy Affair Loader</title>
-  <style>
-    :root {
-      --bg: #f6f1ea;
-      --brown-1: #9a7566;
-      --brown-2: #69473b;
-      --brown-3: #3c2720;
-      --gold: #d6be95;
-      --lock-1: #f5f2ed;
-      --lock-2: #bdb5aa;
-      --shadow: 0 28px 60px rgba(36, 22, 18, 0.18);
-      --phone-shadow: 0 18px 36px rgba(22, 16, 14, 0.16);
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Privacy Affair Loader</title>
+<style>
+:root{--paper:#fcf8f2;--muted:#756863;--display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fcf8f2;color:#241b18;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+.loader {
+  width: min(420px, calc(100vw - 40px));
+  text-align: center;
+  padding-top: 18px;
+}
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      background: var(--bg);
-      font-family: Arial, Helvetica, sans-serif;
-      overflow: hidden;
-    }
+.loader-scene {
+  position: relative;
+  width: 250px;
+  height: 390px;
+  margin: 0 auto 22px;
+}
 
-    .loader-wrap {
-      width: min(360px, calc(100vw - 32px));
-      text-align: center;
-    }
+/* The complete pouch assembly appears first */
+.pouch-shell {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 132px;
+  height: 242px;
+  margin-left: -66px;
+  opacity: 0;
+  transform: translateY(22px) scale(.98);
+  animation: pouchAppear .55s cubic-bezier(.2,.7,.2,1) .12s forwards;
+  overflow: visible;
+}
 
-    .scene {
-      position: relative;
-      width: 220px;
-      height: 350px;
-      margin: 0 auto 26px;
-    }
+.pouch-back {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 20px 20px 30px 30px;
+  background:
+linear-gradient(110deg, rgba(255,255,255,.08), transparent 28%),
+linear-gradient(165deg, #967062 0%, #624137 58%, #38231d 100%);
+  box-shadow: 0 30px 58px rgba(39,24,19,.20);
+  overflow: hidden;
+}
 
-    /* POUCH */
-    .pouch {
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      width: 136px; /* slightly wider than phone */
-      height: 240px;
-      margin-left: -68px;
-      opacity: 0;
-      transform: translateY(24px) scale(.98);
-      animation: pouchIn .55s cubic-bezier(.2,.7,.2,1) .15s forwards;
-    }
+.pouch-back::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 13px 13px 22px 22px;
+  border: 1px dashed rgba(224,198,157,.28);
+}
 
-    .pouch-back {
-      position: absolute;
-      inset: 0;
-      border-radius: 22px 22px 30px 30px;
-      background: linear-gradient(165deg, var(--brown-1) 0%, var(--brown-2) 58%, var(--brown-3) 100%);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
+.pouch-opening {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 21px;
+  height: 13px;
+  z-index: 2;
+  border-radius: 999px;
+  background: rgba(27,17,13,.40);
+  box-shadow:
+inset 0 1px 0 rgba(255,255,255,.08),
+0 1px 0 rgba(255,255,255,.04);
+}
 
-    .pouch-back::before {
-      content: "";
-      position: absolute;
-      inset: 10px;
-      border-radius: 14px 14px 22px 22px;
-      border: 1px dashed rgba(214,190,149,.28);
-    }
+/* Phone is a child of the pouch, so it stays perfectly aligned */
+.loader-phone {
+  position: absolute;
+  left: 50%;
+  top: -190px;
+  width: 108px;
+  height: 210px;
+  margin-left: -54px;
+  z-index: 3;
+  opacity: 0;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #121212, #322a26);
+  box-shadow: 0 20px 40px rgba(22,14,12,.18);
+  overflow: hidden;
+  animation: phoneInsert 1.72s cubic-bezier(.28,.72,.24,1) .82s forwards;
+}
 
-    .pouch-opening {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: 20px;
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(28, 18, 14, 0.36);
-      z-index: 2;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-    }
+.loader-phone::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 18px;
+  background:
+linear-gradient(155deg, rgba(255,255,255,.16), transparent 42%),
+radial-gradient(circle at 28% 18%, rgba(255,255,255,.18), transparent 24%),
+linear-gradient(180deg, #d8c7be 0%, #a47f72 36%, #4b3731 100%);
+}
 
-    /* PHONE */
-    .phone {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      width: 108px;
-      height: 208px;
-      margin-left: -54px;
-      border-radius: 24px;
-      background: linear-gradient(145deg, #151515, #302925);
-      box-shadow: var(--phone-shadow);
-      overflow: hidden;
-      z-index: 3; /* above back, below front */
-      opacity: 0;
-      transform: translateY(0);
-      animation: phoneSlide 2.2s cubic-bezier(.28,.72,.24,1) .65s forwards;
-    }
+.loader-phone::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  width: 38px;
+  height: 6px;
+  margin-left: -19px;
+  border-radius: 999px;
+  background: #070707;
+}
 
-    .phone::before {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 18px;
-      background:
-        linear-gradient(160deg, rgba(255,255,255,.15), transparent 40%),
-        radial-gradient(circle at 30% 18%, rgba(255,255,255,.18), transparent 24%),
-        linear-gradient(180deg, #d9c7be 0%, #a67f72 34%, #4b3732 100%);
-    }
+.notify {
+  position: absolute;
+  right: 14px;
+  height: 9px;
+  z-index: 4;
+  border-radius: 999px;
+  background: rgba(255,255,255,.84);
+  box-shadow: 0 8px 16px rgba(0,0,0,.08);
+  animation: notificationFade .95s ease 1.08s forwards;
+}
 
-    .phone::after {
-      content: "";
-      position: absolute;
-      width: 38px;
-      height: 6px;
-      left: 50%;
-      top: 12px;
-      margin-left: -19px;
-      border-radius: 999px;
-      background: #070707;
-    }
+.notify.n1 { top: 62px; width: 38px; }
+.notify.n2 { top: 80px; width: 48px; }
+.notify.n3 { top: 98px; width: 28px; }
 
-    .notif {
-      position: absolute;
-      right: 14px;
-      height: 9px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.84);
-      box-shadow: 0 8px 16px rgba(0,0,0,.08);
-      z-index: 4;
-      animation: notifFade 1.25s ease .9s forwards;
-    }
-    .notif.n1 { top: 64px; width: 38px; }
-    .notif.n2 { top: 82px; width: 50px; }
-    .notif.n3 { top: 100px; width: 28px; }
+/* This front panel physically covers the phone as it slides inside */
+.pouch-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 58px;
+  bottom: 0;
+  z-index: 4;
+  border-radius: 0 0 30px 30px;
+  background:
+linear-gradient(110deg, rgba(255,255,255,.06), transparent 30%),
+linear-gradient(165deg, #8b6557 0%, #57372d 58%, #32201a 100%);
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+}
 
-    /* FRONT COVER */
-    .pouch-front {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 48px;
-      bottom: 0;
-      z-index: 5; /* hides phone when inside */
-      border-radius: 0 0 30px 30px;
-      background: linear-gradient(165deg, #8a6557 0%, #57372d 58%, #34211b 100%);
-      overflow: hidden;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-    }
+.pouch-front::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: 8px;
+  bottom: 9px;
+  border-radius: 8px 8px 21px 21px;
+  border: 1px dashed rgba(224,198,157,.30);
+}
 
-    .pouch-front::before {
-      content: "";
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: 8px;
-      bottom: 10px;
-      border-radius: 8px 8px 20px 20px;
-      border: 1px dashed rgba(214,190,149,.30);
-    }
+.pouch-front::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,.18), transparent);
+}
 
-    .pouch-front::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      height: 14px;
-      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,0));
-    }
+/* Real transparent brand mark printed on the cover */
+.pouch-logo {
+  position: absolute;
+  left: 50%;
+  top: 89px;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  z-index: 5;
+  object-fit: contain;
+  pointer-events: none;
+  filter:
+brightness(1.15)
+contrast(1.08)
+drop-shadow(0 1px 0 rgba(24,14,11,.50))
+drop-shadow(0 0 5px rgba(224,198,157,.12));
+}
 
-    .brand-logo {
-      position: absolute;
-      left: 50%;
-      top: 98px;
-      width: 100px;
-      height: auto;
-      margin-left: -50px;
-      z-index: 6;
-      object-fit: contain;
-      opacity: 0;
-      transform: scale(.94);
-      filter:
-        drop-shadow(0 1px 0 rgba(28,18,14,.50))
-        drop-shadow(0 0 7px rgba(231,202,155,.16));
-      animation: logoIn .45s ease .42s forwards;
-      pointer-events: none;
-    }
+.loader-flap {
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: -15px;
+  height: 64px;
+  z-index: 6;
+  border-radius: 16px 16px 10px 10px;
+  background: linear-gradient(160deg, #a47d6e, #5b3b31);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+  transform-origin: 50% 100%;
+  transform: perspective(420px) rotateX(-98deg);
+  animation: flapClose .58s cubic-bezier(.2,.7,.2,1) 2.58s forwards;
+}
 
-    .flap {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: -14px;
-      height: 60px;
-      border-radius: 16px 16px 10px 10px;
-      background: linear-gradient(160deg, #a57f71, #5c3c33);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-      transform-origin: 50% 100%;
-      transform: rotateX(-100deg);
-      z-index: 7;
-      animation: flapClose .7s cubic-bezier(.2,.7,.2,1) 2.35s forwards;
-    }
+.loader-lock {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 42px;
+  height: 20px;
+  margin-left: -21px;
+  z-index: 7;
+  opacity: 0;
+  transform: scale(.82);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f5f2ed, #bcb4aa);
+  box-shadow: 0 8px 18px rgba(0,0,0,.16);
+  animation: magneticLock .28s cubic-bezier(.2,.8,.2,1.2) 3.12s forwards;
+}
 
-    .magnet {
-      position: absolute;
-      left: 50%;
-      top: 8px;
-      width: 42px;
-      height: 20px;
-      margin-left: -21px;
-      border-radius: 8px;
-      background: linear-gradient(180deg, var(--lock-1), var(--lock-2));
-      box-shadow: 0 8px 18px rgba(0,0,0,.16);
-      z-index: 8;
-      opacity: 0;
-      transform: scale(.86);
-      animation: lockIn .28s ease 3.0s forwards;
-    }
+.loader-lock::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 12px;
+  height: 4px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: rgba(214,190,149,.36);
+  filter: blur(3px);
+}
 
-    .copy {
-      opacity: 0;
-      transform: translateY(10px);
-      animation: copyIn .5s ease 3.15s forwards;
-    }
+.loader-copy {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: copyAppear .48s ease 3.30s forwards;
+}
 
-    .copy strong {
-      display: block;
-      font-size: 28px;
-      font-weight: 600;
-      color: #2b1f1b;
-      margin-bottom: 8px;
-    }
+.loader-copy strong {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 38px);
+  font-weight: 500;
+  letter-spacing: -.03em;
+}
 
-    .copy span {
-      display: block;
-      font-size: 11px;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: #7a6d68;
-    }
+.loader-copy span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+}
 
-    @keyframes pouchIn {
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+.skip-intro {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: 10px;
+}
 
-    @keyframes phoneSlide {
-      0%   { opacity: 0; transform: translateY(0); }
-      8%   { opacity: 1; transform: translateY(0); }
-      22%  { opacity: 1; transform: translateY(0); }
-      68%  { opacity: 1; transform: translateY(96px); }
-      82%  { opacity: 1; transform: translateY(112px); }
-      100% { opacity: 1; transform: translateY(112px); } /* fully inside, hidden by front cover */
-    }
+@keyframes pouchAppear {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-    @keyframes notifFade {
-      0%, 45% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(10px); }
-    }
+@keyframes phoneInsert {
+  0%   { opacity: 0; transform: translateY(0); box-shadow: 0 20px 40px rgba(22,14,12,.18); }
+  10%  { opacity: 1; transform: translateY(0); box-shadow: 0 20px 40px rgba(22,14,12,.18); }
+  24%  { opacity: 1; transform: translateY(0); }
+  70%  { opacity: 1; transform: translateY(214px); }
+  82%  { opacity: 0; transform: translateY(240px); box-shadow: none; }
+  100% { opacity: 0; transform: translateY(252px); box-shadow: none; }
+}
 
-    @keyframes flapClose {
-      from { transform: rotateX(-100deg); }
-      to   { transform: rotateX(0deg); }
-    }
+@keyframes notificationFade {
+  0%, 35% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(10px); }
+}
 
-    @keyframes lockIn {
-      to { opacity: 1; transform: scale(1); }
-    }
+@keyframes flapClose {
+  from { transform: perspective(420px) rotateX(-98deg); }
+  to   { transform: perspective(420px) rotateX(0deg); }
+}
 
-    @keyframes logoIn {
-      from { opacity: 0; transform: scale(.92); }
-      to   { opacity: 1; transform: scale(1); }
-    }
+@keyframes magneticLock {
+  0%   { opacity: 0; transform: scale(.82) translateY(-4px); }
+  70%  { opacity: 1; transform: scale(1.08) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
 
-    @keyframes copyIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+@keyframes copyAppear {
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </head>
 <body>
-  <div class="loader-wrap">
-    <div class="scene">
-      <div class="pouch">
-        <div class="pouch-back"></div>
-        <div class="pouch-opening"></div>
-        <div class="pouch-front"></div>
-        <img class="brand-logo" src="assets/logo-pouch.png" alt="The Privacy Affair logo" />
-        <div class="flap"></div>
-        <div class="magnet"></div>
-      </div>
-
-      <div class="phone">
-        <span class="notif n1"></span>
-        <span class="notif n2"></span>
-        <span class="notif n3"></span>
-      </div>
+<div class="loader">
+<div class="loader-scene">
+  <div class="pouch-shell">
+    <div class="pouch-back"></div>
+    <div class="pouch-opening"></div>
+    <div class="loader-phone">
+      <span class="notify n1"></span><span class="notify n2"></span><span class="notify n3"></span>
     </div>
-
-    <div class="copy">
-      <strong>The Privacy Affair</strong>
-      <span>Camera-free moments</span>
-    </div>
+    <div class="pouch-front"></div>
+    <img class="pouch-logo" src="assets/logo-pouch.png" alt="The Privacy Affair logo">
+    <div class="loader-flap"></div>
+    <div class="loader-lock"></div>
   </div>
+</div>
+<div class="loader-copy"><strong>Be present. Keep it private.</strong><span>Camera-free events & privacy pouches</span></div>
+</div>
 </body>
 </html>
